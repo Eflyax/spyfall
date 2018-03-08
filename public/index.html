@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SpyFall</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="css/style.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+
+<div id="root"></div>
+
+<script src="js/jquery.min.js"></script>
+<script src="js/socket.io.js"></script>
+<script src="js/socket.js"></script>
+
+<div id="app">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div id="welcome" class="state">
+                    <span>Přezdívka:</span>
+                    <input type="text">
+                    <button class="btn">Potvrdit</button>
+                </div>
+                <div id="setup" class="state">
+                    <button class="btn">Založit hru</button>
+                    <button class="btn">Připojit se do hry</button>
+                </div>
+                <div id="connectGame" class="state">
+                    <span>ID hry: </span>
+                    <input type="text">
+                    <button class="btn">Připojit se</button>
+                </div>
+                <div id="joinGame" class="state">
+                    <button class="btn">Založit hru</button>
+                    <button class="btn">Připojit se do hry</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
