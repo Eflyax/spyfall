@@ -3,3 +3,11 @@
     padding: 10px;
     border: 1px solid gray;
 }
+
+.disabled {
+    background-color: #BF5D62;
+}
+
+.enabled {
+    background-color: #7dbf6c;
+}

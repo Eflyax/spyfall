@@ -1,6 +1,7 @@
 var app = require('express')();
 var server = require('http').Server(app);
-const io = require('socket.io')(server);
+var io = require('socket.io')(server);
+
 
 const ClientManager = require('./ClientManager');
 const ChatroomManager = require('./ChatroomManager');
@@ -9,41 +10,49 @@ const makeHandlers = require('./handlers');
 const clientManager = ClientManager();
 const chatroomManager = ChatroomManager();
 
-io.on('connection', function (client) {
-    const {
-        handleRegister,
-        handleJoin,
-        handleLeave,
-        handleMessage,
-        handleGetChatrooms,
-        handleGetAvailableUsers,
-        handleDisconnect
-    } = makeHandlers(client, clientManager, chatroomManager);
+io.on('connection', function (socket) {
+    io.emit('message', 'Nové připojení...');
+    console.log('Client connected');
 
-    console.log('client connected...', client.id);
-    clientManager.addClient(client);
-
-    client.on('register', handleRegister);
-
-    client.on('join', handleJoin);
-
-    client.on('leave', handleLeave);
-
-    client.on('message', handleMessage);
-
-    client.on('chatrooms', handleGetChatrooms);
-
-    client.on('availableUsers', handleGetAvailableUsers);
-
-    client.on('disconnect', function () {
-        console.log('client disconnect...', client.id);
-        handleDisconnect()
+    socket.on('register', function (nickname) {
+        clientManager.addClient(socket, nickname);
+        console.log(nickname + ' registered');
+        io.emit('registered');
     });
 
-    client.on('error', function (err) {
-        console.log('received error from client:', client.id);
+    socket.on('join', function () {
+
+    });
+
+    socket.on('leave', function () {
+
+    });
+
+    socket.on('message', function () {
+
+    });
+
+    socket.on('chatrooms', function () {
+
+    });
+
+    socket.on('availableUsers', function () {
+
+    });
+
+    socket.on('disconnect', function () {
+        console.log('client disconnect...', socket.id);
+    });
+
+    socket.on('error', function (err) {
+        console.log('received error from client:', socket.id);
         console.log(err)
-    })
+    });
+
+    socket.on("*", function (event, data) {
+        console.log(event);
+        console.log(data);
+    });
 });
 
 server.listen(3000, function (err) {
