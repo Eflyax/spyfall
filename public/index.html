@@ -41,7 +41,7 @@
 
                 <div id="startGame" class="state disabled">
                     Počet připojených klientů: <span id="usersCount"> </span>
-                    <button class="btn">Start</button>
+                    <button class="btn" id="startGameButton">Start</button>
                 </div>
 
                 <div id="waitForStart" class="state disabled">
@@ -50,8 +50,8 @@
 
                 <div id="gameContent" class="state disabled">
                     <p>Id hry: <span id="roomId"></span></p>
-                    <p>Místo: xyz</p>
-                    <p>Role: xyz</p>
+                    <p>Místo: <span id="location"></span></p>
+                    <p>Role: <span id="role"></span></p>
                     <button class="btn">Zahájit hlasování</button>
                     <button class="btn">Restartovat hru hry</button>
                     <button class="btn">Konec hry</button>

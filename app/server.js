@@ -15,6 +15,14 @@ function broadcastMessage(roomId, key, message) {
     );
 }
 
+function shuffle(a) {
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
 io.on('connection', function (socket) {
     socket.on('register', function (nickname) {
         clientManager.addClient(socket, nickname);
@@ -39,10 +47,36 @@ io.on('connection', function (socket) {
             } else {
                 chatroomManager.addUser(id, socket);
                 var count = chatroomManager.getUsersCount(id);
-                broadcastMessage(id, 'joined', {'status': '3', 'count': count});
+                broadcastMessage(id, 'joined', {
+                    'status': '3',
+                    'count': count,
+                    'owner': room.owner,
+                });
             }
         } else {
             socket.emit('joined', {'status': '2', 'count': '0'});
+        }
+    });
+
+    socket.on('startGame', function (gameId) {
+        var room = chatroomManager.getRoomById(gameId);
+        if (room.owner === socket.id) {
+            var shuffledRoles = shuffle(chatroomManager.getRolesForKey('Hotel'));
+            var spyPosition = Math.floor(Math.random() * chatroomManager.getUsersCount(gameId));
+            shuffledRoles[spyPosition] = 'Špión';
+
+            var clientsInRoom = chatroomManager.getRooms().get(gameId).clients;
+            var index = 0;
+
+            clientsInRoom.forEach(function (item, key, mapObj) {
+                io.to([key]).emit('startedGame', {
+                    'location': room.location,
+                    'role': shuffledRoles[index],
+                    'time': room.time,
+                });
+                index++;
+            });
+
         }
     });
 
@@ -54,15 +88,8 @@ io.on('connection', function (socket) {
 
     });
 
-    socket.on('chatrooms', function () {
-
-    });
 
     socket.on('print', function () {
-
-    });
-
-    socket.on('availableUsers', function () {
 
     });
 
@@ -74,7 +101,8 @@ io.on('connection', function (socket) {
         console.log('received error from client:', socket.id);
         console.log(err)
     });
-});
+})
+;
 
 server.listen(3000, function (err) {
     if (err) throw err;

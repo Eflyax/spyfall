@@ -7,6 +7,10 @@ module.exports = function () {
         'Letadlo': ['Pilot', 'Druhý pilot', 'Pasažér v ekonomické třídě', 'Letecký mechanik', 'Pasažér v byzbys třídě', 'Letuška', 'Černý pasažér'],
     };
 
+    function getRolesForKey(key) {
+        return cards[key];
+    }
+
     function createRoom(idRoom, socket) {
         var secondsToEnd = 480;
         var maxPlayers = 8;
@@ -16,7 +20,6 @@ module.exports = function () {
             'owner': socket.id,
             'time': secondsToEnd,
             'location': location,
-            'role': pickRandomRole(location),
             'playersMax': maxPlayers,
             'playersCurrent': 1,
             'clients': new Map(),
@@ -65,6 +68,7 @@ module.exports = function () {
     }
 
     return {
+        getRolesForKey,
         getUsersCount,
         addUser,
         removeUser,

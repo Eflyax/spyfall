@@ -3,6 +3,8 @@ $(document).ready(function () {
     errorElement.hide();
     var socket = io('http://127.0.0.1:3000', {});
 
+    var gameId = null;
+
     $('#welcome').on('click', '#sendNickName', function () {
         var nickname = $('#nickNameInput').val();
         console.log('posílám nick: ' + nickname);
@@ -13,6 +15,10 @@ $(document).ready(function () {
     $('#app').on('click', '.print', function () {
         console.log('print ');
         // socket.send('print');
+    });
+
+    $('#startGame').on('click', '#startGameButton', function () {
+        socket.emit('startGame', gameId);
     });
 
     $('#setup').on('click', '#create', function () {
@@ -68,6 +74,10 @@ $(document).ready(function () {
             case'3': // success
                 $('#usersCount').text(data.count);
                 enableElement('#startGame');
+                var startButton = $('startGameButton');
+                data.owner === socket.id
+                    ? startButton.show()
+                    : startButton.hide();
                 break;
         }
     });
@@ -76,6 +86,19 @@ $(document).ready(function () {
         $('#roomId').text(data.roomId);
         $('#usersCount').text(data.users);
         enableElement('#startGame');
+        gameId = data.roomId;
+    });
+
+    socket.on('startedGame', function (data) {
+
+        console.log('hra tačaka');
+        console.log(data);
+
+        $('#roomId').text(data.roomId);
+        $('#location').text(data.location);
+        $('#role').text(data.role);
+        enableElement('#gameContent');
+        gameId = data.roomId;
     });
 
     socket.on('event', function (data) {
