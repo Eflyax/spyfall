@@ -28,27 +28,28 @@
                 </div>
 
                 <div id="setup" class="state disabled">
-                    <button class="btn">Založit hru</button>
-                    <button class="btn">Připojit se do hry</button>
+                    <button class="btn" id="create">Založit hru</button>
+                    <button class="btn" id="joinGameButton">Připojit se do hry</button>
                 </div>
 
                 <div id="connectGame" class="state disabled">
                     <span>ID hry: </span>
-                    <input type="text">
-                    <button class="btn">Připojit se</button>
+                    <input type="text" id="gameIdToJoin">
+                    <button class="btn" id="joinToGameButton">Připojit se</button>
+                    <span class="alert alert-danger" id="joinError"></span>
                 </div>
 
-                <div id="starGame" class="state disabled">
-                    Počet připojených klientů: <b>x</b>
+                <div id="startGame" class="state disabled">
+                    Počet připojených klientů: <span id="usersCount"> </span>
                     <button class="btn">Start</button>
                 </div>
 
-                <div id="joinGame" class="state disabled">
-                    <button class="btn">Založit hru</button>
-                    <button class="btn">Připojit se do hry</button>
+                <div id="waitForStart" class="state disabled">
+                    Čeká se na spuštění hry
                 </div>
 
                 <div id="gameContent" class="state disabled">
+                    <p>Id hry: <span id="roomId"></span></p>
                     <p>Místo: xyz</p>
                     <p>Role: xyz</p>
                     <button class="btn">Zahájit hlasování</button>

@@ -5,23 +5,45 @@ var io = require('socket.io')(server);
 
 const ClientManager = require('./ClientManager');
 const ChatroomManager = require('./ChatroomManager');
-const makeHandlers = require('./handlers');
 
 const clientManager = ClientManager();
 const chatroomManager = ChatroomManager();
 
-io.on('connection', function (socket) {
-    io.emit('message', 'Nové připojení...');
-    console.log('Client connected');
+function broadcastMessage(roomId, key, message) {
+    chatroomManager.getRooms().get(roomId).clients.forEach(
+        m => m.emit(key, message)
+    );
+}
 
+io.on('connection', function (socket) {
     socket.on('register', function (nickname) {
         clientManager.addClient(socket, nickname);
-        console.log(nickname + ' registered');
-        io.emit('registered');
+        socket.emit('registered');
     });
 
-    socket.on('join', function () {
+    socket.on('create', function () {
+        console.log('chce vytvořit');
+        var roomId = makeId();
+        var room = chatroomManager.createRoom(roomId, socket);
+        socket.emit('created', {
+            'roomId': room.id,
+            'users': room.playersCurrent,
+        });
+    });
 
+    socket.on('join', function (id) {
+        var room = chatroomManager.getRoomById(id);
+        if (room) {
+            if (room.playersCurrent >= room.playersMax) {
+                socket.emit('joined', {'status': '1', 'count': '0'});
+            } else {
+                chatroomManager.addUser(id, socket);
+                var count = chatroomManager.getUsersCount(id);
+                broadcastMessage(id, 'joined', {'status': '3', 'count': count});
+            }
+        } else {
+            socket.emit('joined', {'status': '2', 'count': '0'});
+        }
     });
 
     socket.on('leave', function () {
@@ -33,6 +55,10 @@ io.on('connection', function (socket) {
     });
 
     socket.on('chatrooms', function () {
+
+    });
+
+    socket.on('print', function () {
 
     });
 
@@ -48,11 +74,6 @@ io.on('connection', function (socket) {
         console.log('received error from client:', socket.id);
         console.log(err)
     });
-
-    socket.on("*", function (event, data) {
-        console.log(event);
-        console.log(data);
-    });
 });
 
 server.listen(3000, function (err) {
@@ -65,3 +86,14 @@ app.get('*', function (req, res) {
         path = req.params[0] ? req.params[0] : 'index.html';
     res.sendFile(path, {root: './public'});
 });
+
+
+function makeId() {
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+    for (var i = 0; i < 5; i++)
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+    return text;
+}
