@@ -48,6 +48,10 @@ $(document).ready(function () {
         socket.emit('continue');
     });
 
+    $('#gameContent').on('click', '.newGame', function () {
+        socket.emit('startNewGame');
+    });
+
     var enableElement = function (selector) {
         $('.state').each(function () {
             $(this).removeClass('enabled');
@@ -139,6 +143,8 @@ $(document).ready(function () {
                 $('#usersCount').text(data.count);
                 $('.roomId').text(data.roomId);
                 $('.continue').hide();
+                gameId = data.roomId;
+                role = null;
                 enableElement('#startGame');
                 var startButton = $('#startGameButton');
                 data.owner === socket.id

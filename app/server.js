@@ -9,10 +9,11 @@ const ChatroomManager = require('./ChatroomManager');
 const clientManager = ClientManager();
 const chatroomManager = ChatroomManager();
 
-function broadcastMessage(roomId, key, message) {
-    chatroomManager.getRooms().get(roomId).clients.forEach(
-        m => m.emit(key, message)
-    );
+function broadcastMessage(roomId, messageKey, obj) {
+    var clientsInRoom = chatroomManager.getRooms().get(roomId).clients;
+    clientsInRoom.forEach(function (item, key, mapObj) {
+        io.to([key]).emit(messageKey, obj);
+    });
 }
 
 function shuffle(a) {
@@ -32,7 +33,7 @@ io.on('connection', function (socket) {
 
     socket.on('create', function () {
         var roomId = makeId();
-        var room = chatroomManager.createRoom(roomId, socket);
+        var room = chatroomManager.createRoom(roomId, socket.id);
         socket.emit('created', {
             'roomId': room.id,
             'users': room.playersCurrent,
@@ -60,6 +61,8 @@ io.on('connection', function (socket) {
 
     socket.on('print', function () {
         console.log(clientManager.getClients());
+        console.log('_________________________________');
+        console.log(chatroomManager.getRooms());
     });
 
     socket.on('continue', function () {
@@ -87,7 +90,7 @@ io.on('connection', function (socket) {
                     'count': '0'
                 });
             } else {
-                chatroomManager.addUser(id, socket);
+                chatroomManager.addUser(id, socket.id);
                 var count = chatroomManager.getUsersCount(id);
                 broadcastMessage(id, 'joined', {
                     'status': C.JOIN_STATUS_OK,
@@ -131,6 +134,32 @@ io.on('connection', function (socket) {
 
     socket.on('leave', function () {
         clientManager.removeClient(socket);
+    });
+
+    socket.on('startNewGame', function () {
+        var newRoomId = makeId();
+        var client = clientManager.getClientById(socket.id);
+        var oldRoomId = client.room;
+        var clientsInRoom = chatroomManager.getRooms().get(oldRoomId).clients;
+        var room = chatroomManager.createRoom(newRoomId, socket.id);
+        client.room = newRoomId;
+        chatroomManager.addUser(newRoomId, socket.id);
+        room.owner = socket.id;
+        clientsInRoom.forEach(function (item, key, mapObj) {
+            var clientInRoom = clientManager.getClientById(key);
+            clientInRoom.room = newRoomId;
+            clientInRoom.alreadyVoted = 0;
+            clientInRoom.role = null;
+            chatroomManager.addUser(newRoomId, key);
+        });
+        var count = chatroomManager.getUsersCount(newRoomId);
+        broadcastMessage(newRoomId, 'joined', {
+            'status': C.JOIN_STATUS_OK,
+            'count': count,
+            'owner': room.owner,
+            'roomId': room.id,
+        });
+        chatroomManager.removeRoom(oldRoomId);
     });
 
     socket.on('message', function () {

@@ -13,12 +13,12 @@ module.exports = function () {
         return cards[key];
     }
 
-    function createRoom(idRoom, socket) {
+    function createRoom(idRoom, socketId) {
 
         var location = pickRandomLocation();
         chatrooms.set(idRoom, {
             'id': idRoom,
-            'owner': socket.id,
+            'owner': socketId,
             'time': C.SECONDS_TO_END,
             'location': location,
             'playersMax': C.MAX_PLAYERS,
@@ -26,9 +26,13 @@ module.exports = function () {
             'clients': new Map(),
             'state': C.STATE_NEW
         });
-        addUser(idRoom, socket);
+        addUser(idRoom, socketId);
 
         return chatrooms.get(idRoom);
+    }
+
+    function removeRoom(roomId) {
+        chatrooms.delete(roomId)
     }
 
     function pickRandomRole(location) {
@@ -74,9 +78,9 @@ module.exports = function () {
         return result;
     }
 
-    function addUser(roomId, client) {
+    function addUser(roomId, clientId) {
         var room = chatrooms.get(roomId);
-        room.clients.set(client.id, client);
+        room.clients.set(clientId, clientId);
     }
 
     function removeUser(roomId, client) {
@@ -91,6 +95,7 @@ module.exports = function () {
         createRoom,
         getRooms,
         updateRoom,
+        removeRoom,
         getRoomById
     }
 };
