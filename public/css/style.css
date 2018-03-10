@@ -11,3 +11,7 @@
 .enabled {
     background-color: #7dbf6c;
 }
+
+.currentTime {
+    font-size: 50px;
+}

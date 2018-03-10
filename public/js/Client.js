@@ -1,9 +1,15 @@
 $(document).ready(function () {
     var errorElement = $('#joinError');
+
+    const STATE_NEW = 'new',
+        STATE_STARTED = 'started',
+        STATE_PAUSED = 'paused',
+        STATE_END = 'end';
+
     errorElement.hide();
     var socket = io('http://127.0.0.1:3000', {});
-
     var gameId = null;
+    var role = '';
 
     $('#welcome').on('click', '#sendNickName', function () {
         var nickname = $('#nickNameInput').val();
@@ -13,8 +19,7 @@ $(document).ready(function () {
     });
 
     $('#app').on('click', '.print', function () {
-        console.log('print ');
-        // socket.send('print');
+        console.log('print');
     });
 
     $('#startGame').on('click', '#startGameButton', function () {
@@ -43,6 +48,10 @@ $(document).ready(function () {
         $(selector).addClass('enabled');
     };
 
+    var formatTime = function (time) {
+
+    };
+
     socket.on('connect', function () {
         enableElement('#welcome');
     });
@@ -60,6 +69,29 @@ $(document).ready(function () {
 
     });
 
+    socket.on('tick', function (data) {
+        $('.currentTime').text(data.time);
+        var state = '';
+        switch (data.state) {
+            case STATE_END:
+                state = 'Hra ukončena';
+                break;
+            case STATE_PAUSED:
+                state = 'Hra pozastavena';
+                break;
+            case STATE_NEW:
+                state = 'Hra nezapočala';
+                break;
+            case STATE_STARTED:
+                state = '';
+                break;
+            default:
+                state = 'Nerozpoznaný herní stav';
+                break;
+        }
+        $('.gameState').text(state);
+    });
+
     socket.on('joined', function (data) {
         console.log(data);
         switch (data.status) {
@@ -73,8 +105,9 @@ $(document).ready(function () {
                 break;
             case'3': // success
                 $('#usersCount').text(data.count);
+                $('.roomId').text(data.roomId);
                 enableElement('#startGame');
-                var startButton = $('startGameButton');
+                var startButton = $('#startGameButton');
                 data.owner === socket.id
                     ? startButton.show()
                     : startButton.hide();
@@ -83,22 +116,20 @@ $(document).ready(function () {
     });
 
     socket.on('created', function (data) {
-        $('#roomId').text(data.roomId);
+        $('.roomId').text(data.roomId);
         $('#usersCount').text(data.users);
         enableElement('#startGame');
         gameId = data.roomId;
     });
 
     socket.on('startedGame', function (data) {
-
-        console.log('hra tačaka');
-        console.log(data);
-
-        $('#roomId').text(data.roomId);
+        $('.roomId').text(data.roomId);
         $('#location').text(data.location);
         $('#role').text(data.role);
         enableElement('#gameContent');
         gameId = data.roomId;
+        role = data.role;
+        $('.startVote').text('Zahájit hlasování');
     });
 
     socket.on('event', function (data) {

@@ -9,6 +9,7 @@
 
 <div id="root"></div>
 
+<script src="js/bootstrap.min.js"></script>
 <script src="js/jquery.min.js"></script>
 <script src="js/socket.io.js"></script>
 <script src="js/Client.js"></script>
@@ -42,19 +43,27 @@
                 <div id="startGame" class="state disabled">
                     Počet připojených klientů: <span id="usersCount"> </span>
                     <button class="btn" id="startGameButton">Start</button>
-                </div>
-
-                <div id="waitForStart" class="state disabled">
-                    Čeká se na spuštění hry
+                    ID místnosti: <p class="roomId"></p>
                 </div>
 
                 <div id="gameContent" class="state disabled">
-                    <p>Id hry: <span id="roomId"></span></p>
-                    <p>Místo: <span id="location"></span></p>
-                    <p>Role: <span id="role"></span></p>
-                    <button class="btn">Zahájit hlasování</button>
-                    <button class="btn">Restartovat hru hry</button>
-                    <button class="btn">Konec hry</button>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <span>Id hry: <span class="roomId"></span></span>
+                            <span>Místo: <span id="location"></span></span>
+                            <span>Role: <span id="role"></span></span>
+                        </div>
+                        <div class="col-md-6">
+                            <span class="currentTime">
+                                0:00
+                            </span>
+                            <span class="gameState"></span>
+
+                        </div>
+                    </div>
+
+                    <button class="btn" class="startVote"></button>
+                    <button class="btn">Nová hra</button>
                 </div>
             </div>
         </div>

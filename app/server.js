@@ -2,12 +2,13 @@ var app = require('express')();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
 
-
+const C = require('./constants');
 const ClientManager = require('./ClientManager');
 const ChatroomManager = require('./ChatroomManager');
 
 const clientManager = ClientManager();
 const chatroomManager = ChatroomManager();
+
 
 function broadcastMessage(roomId, key, message) {
     chatroomManager.getRooms().get(roomId).clients.forEach(
@@ -20,6 +21,7 @@ function shuffle(a) {
         const j = Math.floor(Math.random() * (i + 1));
         [a[i], a[j]] = [a[j], a[i]];
     }
+
     return a;
 }
 
@@ -30,7 +32,6 @@ io.on('connection', function (socket) {
     });
 
     socket.on('create', function () {
-        console.log('chce vytvořit');
         var roomId = makeId();
         var room = chatroomManager.createRoom(roomId, socket);
         socket.emit('created', {
@@ -51,6 +52,7 @@ io.on('connection', function (socket) {
                     'status': '3',
                     'count': count,
                     'owner': room.owner,
+                    'roomId': room.id,
                 });
             }
         } else {
@@ -61,22 +63,22 @@ io.on('connection', function (socket) {
     socket.on('startGame', function (gameId) {
         var room = chatroomManager.getRoomById(gameId);
         if (room.owner === socket.id) {
-            var shuffledRoles = shuffle(chatroomManager.getRolesForKey('Hotel'));
+            room.state = C.STATE_STARTED;
+            var shuffledRoles = shuffle(chatroomManager.getRolesForKey(room.location));
             var spyPosition = Math.floor(Math.random() * chatroomManager.getUsersCount(gameId));
-            shuffledRoles[spyPosition] = 'Špión';
+            shuffledRoles[spyPosition] = C.SPY;
 
             var clientsInRoom = chatroomManager.getRooms().get(gameId).clients;
             var index = 0;
 
             clientsInRoom.forEach(function (item, key, mapObj) {
                 io.to([key]).emit('startedGame', {
-                    'location': room.location,
+                    'location': shuffledRoles[index] === C.SPY ? '?' : room.location,
                     'role': shuffledRoles[index],
                     'time': room.time,
                 });
                 index++;
             });
-
         }
     });
 
@@ -87,7 +89,6 @@ io.on('connection', function (socket) {
     socket.on('message', function () {
 
     });
-
 
     socket.on('print', function () {
 
@@ -101,8 +102,7 @@ io.on('connection', function (socket) {
         console.log('received error from client:', socket.id);
         console.log(err)
     });
-})
-;
+});
 
 server.listen(3000, function (err) {
     if (err) throw err;
@@ -115,13 +115,29 @@ app.get('*', function (req, res) {
     res.sendFile(path, {root: './public'});
 });
 
+function updateRooms() {
+    for (let key of chatroomManager.getRooms().keys()) {
+        var room = chatroomManager.getRoomById(key);
+        if (room.state === C.STATE_STARTED) {
+            var output = chatroomManager.updateRoom(key);
+            broadcastMessage(key, 'tick', {
+                'time': output.time,
+                'state': output.state,
+                'info': '',
+            });
+        }
+    }
+}
+
+setInterval(updateRooms, 1000);
 
 function makeId() {
     var text = "";
     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
-    for (var i = 0; i < 5; i++)
+    for (var i = 0; i < 5; i++) {
         text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
 
     return text;
 }

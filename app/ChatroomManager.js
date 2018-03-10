@@ -1,3 +1,5 @@
+const C = require('./constants');
+
 module.exports = function () {
     // mapping of all available chatrooms
     const chatrooms = new Map();
@@ -12,17 +14,17 @@ module.exports = function () {
     }
 
     function createRoom(idRoom, socket) {
-        var secondsToEnd = 480;
-        var maxPlayers = 8;
+
         var location = pickRandomLocation();
         chatrooms.set(idRoom, {
             'id': idRoom,
             'owner': socket.id,
-            'time': secondsToEnd,
+            'time': C.SECONDS_TO_END,
             'location': location,
-            'playersMax': maxPlayers,
+            'playersMax': C.MAX_PLAYERS,
             'playersCurrent': 1,
             'clients': new Map(),
+            'state': C.STATE_NEW
         });
         addUser(idRoom, socket);
 
@@ -45,6 +47,20 @@ module.exports = function () {
 
     function getRoomById(id) {
         return chatrooms.get(id);
+    }
+
+    function updateRoom(id) {
+        var room = getRoomById(id);
+
+        if (room.state === C.STATE_STARTED) {
+            if (room.time <= 0) {
+                room.state = C.STATE_END;
+            } else {
+                room.time--;
+            }
+        }
+
+        return {'time': room.time, 'state': room.state};
     }
 
     function pickRandomLocation() {
@@ -74,6 +90,7 @@ module.exports = function () {
         removeUser,
         createRoom,
         getRooms,
+        updateRoom,
         getRoomById,
     }
 };
