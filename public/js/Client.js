@@ -13,13 +13,11 @@ $(document).ready(function () {
 
     $('#welcome').on('click', '#sendNickName', function () {
         var nickname = $('#nickNameInput').val();
-        console.log('posílám nick: ' + nickname);
         socket.emit('register', nickname);
-        console.log('odesláno');
     });
 
     $('#app').on('click', '.print', function () {
-        console.log('print');
+        socket.emit('print');
     });
 
     $('#startGame').on('click', '#startGameButton', function () {
@@ -27,7 +25,6 @@ $(document).ready(function () {
     });
 
     $('#setup').on('click', '#create', function () {
-        console.log('odesílám žádost o vytvoření');
         socket.emit('create');
     });
 
@@ -40,6 +37,17 @@ $(document).ready(function () {
         socket.emit('join', gameId);
     });
 
+    $('#gameContent').on('click', '.startVote', function () {
+        socket.emit('voteStarted');
+        $('.startVote').hide();
+    });
+
+    $('#gameContent').on('click', '.continue', function () {
+        $('.continue').hide();
+        $('.startVote').show();
+        socket.emit('continue');
+    });
+
     var enableElement = function (selector) {
         $('.state').each(function () {
             $(this).removeClass('enabled');
@@ -48,8 +56,21 @@ $(document).ready(function () {
         $(selector).addClass('enabled');
     };
 
-    var formatTime = function (time) {
+    var formatTime = function (sec_num) {
+        var hours = Math.floor(sec_num / 3600);
+        var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+        var seconds = sec_num - (hours * 3600) - (minutes * 60);
 
+        if (hours < 10) {
+            hours = "0" + hours;
+        }
+        if (minutes < 10) {
+            minutes = "0" + minutes;
+        }
+        if (seconds < 10) {
+            seconds = "0" + seconds;
+        }
+        return minutes + ':' + seconds;
     };
 
     socket.on('connect', function () {
@@ -58,7 +79,6 @@ $(document).ready(function () {
 
     socket.on('registered', function () {
         enableElement('#setup');
-        console.log('you are registered');
     });
 
     socket.io.on('connect_error', function () {
@@ -69,15 +89,28 @@ $(document).ready(function () {
 
     });
 
+    socket.on('continue', function (msg) {
+        $('.startVote').attr("disabled", true);
+        $('.startVote').hide();
+        $('.continue').show();
+    });
+
+    socket.on('enableVoting', function (msg) {
+        $('.startVote').removeAttr('disabled');
+        $('.startVote').show();
+        $('.continue').hide();
+    });
+
     socket.on('tick', function (data) {
-        $('.currentTime').text(data.time);
+        $('.currentTime').text(formatTime(data.time));
         var state = '';
         switch (data.state) {
             case STATE_END:
                 state = 'Hra ukončena';
                 break;
             case STATE_PAUSED:
-                state = 'Hra pozastavena';
+                state = data.info;
+                $('.startVote').attr("disabled", true);
                 break;
             case STATE_NEW:
                 state = 'Hra nezapočala';
@@ -93,19 +126,19 @@ $(document).ready(function () {
     });
 
     socket.on('joined', function (data) {
-        console.log(data);
         switch (data.status) {
-            case'1': // full room
+            case 1: // full room
                 errorElement.text('Místnost je plná. Připojení se nezdařilo.');
                 errorElement.show();
                 break;
-            case'2':// not exists
+            case 2:// not exists
                 errorElement.text('Místnost neexistuje. Připojení se nezdařilo.');
                 errorElement.show();
                 break;
-            case'3': // success
+            case 3: // success
                 $('#usersCount').text(data.count);
                 $('.roomId').text(data.roomId);
+                $('.continue').hide();
                 enableElement('#startGame');
                 var startButton = $('#startGameButton');
                 data.owner === socket.id
@@ -126,10 +159,10 @@ $(document).ready(function () {
         $('.roomId').text(data.roomId);
         $('#location').text(data.location);
         $('#role').text(data.role);
+        $('.continue').hide();
         enableElement('#gameContent');
         gameId = data.roomId;
         role = data.role;
-        $('.startVote').text('Zahájit hlasování');
     });
 
     socket.on('event', function (data) {

@@ -9,7 +9,6 @@ const ChatroomManager = require('./ChatroomManager');
 const clientManager = ClientManager();
 const chatroomManager = ChatroomManager();
 
-
 function broadcastMessage(roomId, key, message) {
     chatroomManager.getRooms().get(roomId).clients.forEach(
         m => m.emit(key, message)
@@ -38,25 +37,71 @@ io.on('connection', function (socket) {
             'roomId': room.id,
             'users': room.playersCurrent,
         });
+        clientManager.getClientById(socket.id).room = room.id;
+    });
+
+    socket.on('voteStarted', function () {
+        var client = clientManager.getClientById(socket.id);
+        var room = chatroomManager.getRoomById(client.room);
+        room.state = C.STATE_PAUSED;
+        if (client.alreadyVoted === 0) {
+            clientManager.getClientById(socket.id).alreadyVoted = 1;
+            broadcastMessage(room.id, 'tick', {
+                'time': room.time,
+                'state': C.STATE_PAUSED,
+                'info': 'Probíhá hlasování...',
+            });
+            socket.emit('continue');
+            // if (client.role === C.SPY) {
+            //     poslat info zda to uhadl nebo prohrál
+            // }
+        }
+    });
+
+    socket.on('print', function () {
+        console.log(clientManager.getClients());
+    });
+
+    socket.on('continue', function () {
+        var client = clientManager.getClientById(socket.id);
+        if (room = chatroomManager.getRoomById(client.room)) {
+            room.state = C.STATE_STARTED;
+            var clientsInRoom = chatroomManager.getRooms().get(room.id).clients;
+
+            clientsInRoom.forEach(function (item, key, mapObj) {
+                var client = clientManager.getClientById(key);
+                if (client.alreadyVoted === 0) {
+                    io.to([key]).emit('enableVoting');
+                }
+            });
+        }
+
     });
 
     socket.on('join', function (id) {
         var room = chatroomManager.getRoomById(id);
         if (room) {
             if (room.playersCurrent >= room.playersMax) {
-                socket.emit('joined', {'status': '1', 'count': '0'});
+                socket.emit('joined', {
+                    'status': C.JOIN_STATUS_FULL,
+                    'count': '0'
+                });
             } else {
                 chatroomManager.addUser(id, socket);
                 var count = chatroomManager.getUsersCount(id);
                 broadcastMessage(id, 'joined', {
-                    'status': '3',
+                    'status': C.JOIN_STATUS_OK,
                     'count': count,
                     'owner': room.owner,
                     'roomId': room.id,
                 });
+                clientManager.getClientById(socket.id).room = room.id;
             }
         } else {
-            socket.emit('joined', {'status': '2', 'count': '0'});
+            socket.emit('joined', {
+                'status': C.JOIN_STATUS_NOT_EXISTS,
+                'count': '0'
+            });
         }
     });
 
@@ -72,6 +117,8 @@ io.on('connection', function (socket) {
             var index = 0;
 
             clientsInRoom.forEach(function (item, key, mapObj) {
+                var client = clientManager.getClientById(key);
+                client.role = shuffledRoles[index];
                 io.to([key]).emit('startedGame', {
                     'location': shuffledRoles[index] === C.SPY ? '?' : room.location,
                     'role': shuffledRoles[index],
@@ -83,24 +130,21 @@ io.on('connection', function (socket) {
     });
 
     socket.on('leave', function () {
-
+        clientManager.removeClient(socket);
     });
 
     socket.on('message', function () {
 
     });
 
-    socket.on('print', function () {
-
-    });
-
     socket.on('disconnect', function () {
         console.log('client disconnect...', socket.id);
+        clientManager.removeClient(socket);
     });
 
     socket.on('error', function (err) {
         console.log('received error from client:', socket.id);
-        console.log(err)
+        console.log(err);
     });
 });
 

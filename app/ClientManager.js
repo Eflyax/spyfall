@@ -2,15 +2,21 @@ module.exports = function () {
     const clients = new Map();
 
     function addClient(socket, nickname) {
-        clients.set(socket.id, {nickname})
+        clients.set(socket.id,
+            {
+                'nick': nickname,
+                'room': null,
+                'alreadyVoted': 0,
+                'role': null,
+            });
     }
 
     function removeClient(client) {
         clients.delete(client.id)
     }
 
-    function getUserByClientId(clientId) {
-        return (clients.get(clientId) || {}).user
+    function getClientById(id) {
+        return clients.get(id);
     }
 
     function getClients() {
@@ -20,6 +26,7 @@ module.exports = function () {
     return {
         addClient,
         removeClient,
-        getUserByClientId
+        getClientById,
+        getClients
     }
 };
