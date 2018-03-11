@@ -32,6 +32,10 @@ $(document).ready(function () {
         }
     });
 
+    $('.print').click(function () {
+        socket.emit('print');
+    });
+
     $('#welcome').on('click', '#sendNickName', function () {
         processRegistration();
     });
@@ -187,7 +191,7 @@ $(document).ready(function () {
         $('#role').text(data.role);
         $('.continue').hide();
         enableElement('#gameContent');
-        // todo - enable voting
+        $('.startVote').removeAttr('disabled');
         gameId = data.roomId;
         role = data.role;
     });
