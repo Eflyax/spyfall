@@ -7,7 +7,7 @@ $(document).ready(function () {
         STATE_PAUSED = 'paused',
         STATE_END = 'end';
     errorElement.hide();
-    var socket = io('http://127.0.0.1:3000', {});
+
     var gameId = null;
     var role = '';
 
@@ -105,7 +105,7 @@ $(document).ready(function () {
             $('#overlay').hide();
             enableElement('#welcome');
             $('#nickNameInput').focus();
-        }, 500);
+        }, 1500);
     });
 
     socket.on('registered', function () {
