@@ -10,10 +10,20 @@ const clientManager = ClientManager();
 const chatroomManager = ChatroomManager();
 
 function broadcastMessage(roomId, messageKey, obj) {
+    if (!chatroomManager.getRooms().get(roomId)) {
+        return;
+    }
+
     var clientsInRoom = chatroomManager.getRooms().get(roomId).clients;
     clientsInRoom.forEach(function (item, key, mapObj) {
         io.to([key]).emit(messageKey, obj);
     });
+}
+
+function print() {
+    console.log(clientManager.getClients());
+    console.log('_________________________________');
+    console.log(chatroomManager.getRooms());
 }
 
 function shuffle(a) {
@@ -60,9 +70,7 @@ io.on('connection', function (socket) {
     });
 
     socket.on('print', function () {
-        console.log(clientManager.getClients());
-        console.log('_________________________________');
-        console.log(chatroomManager.getRooms());
+        print();
     });
 
     socket.on('continue', function () {
@@ -98,6 +106,7 @@ io.on('connection', function (socket) {
                     'owner': room.owner,
                     'roomId': room.id,
                 });
+                room.playersCurrent++;
                 clientManager.getClientById(socket.id).room = room.id;
             }
         } else {
@@ -114,8 +123,6 @@ io.on('connection', function (socket) {
             room.state = C.STATE_STARTED;
             var shuffledRoles = shuffle(chatroomManager.getRolesForKey(room.location));
             var spyPosition = Math.floor(Math.random() * chatroomManager.getUsersCount(gameId));
-            // shuffledRoles[spyPosition] = C.SPY;
-
             var clientsInRoom = chatroomManager.getRooms().get(gameId).clients;
             var index = 0;
 
@@ -126,7 +133,7 @@ io.on('connection', function (socket) {
                     client.role = C.SPY;
                 }
                 io.to([key]).emit('startedGame', {
-                    'location': shuffledRoles[index] === C.SPY ? '?' : room.location,
+                    'location': index === spyPosition ? '?' : room.location,
                     'role': client.role,
                     'time': room.time,
                 });
@@ -171,6 +178,17 @@ io.on('connection', function (socket) {
 
     socket.on('disconnect', function () {
         console.log('client disconnect...', socket.id);
+        if (clientManager.getClientById(socket.id)) {
+            var roomId = clientManager.getClientById(socket.id).room;
+            var room = chatroomManager.getRooms().get(roomId);
+            if (room) {
+                room.clients.forEach(function (item, key, mapObj) {
+                    item.room = null;
+                });
+                broadcastMessage(room.id, 'somebodyLeft');
+                chatroomManager.removeRoom(room.id);
+            }
+        }
         clientManager.removeClient(socket);
     });
 

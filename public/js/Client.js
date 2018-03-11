@@ -9,7 +9,6 @@ $(document).ready(function () {
     errorElement.hide();
     var socket = io('http://127.0.0.1:3000', {});
     var gameId = null;
-
     var role = '';
 
     var enableElement = function (selector) {
@@ -42,6 +41,7 @@ $(document).ready(function () {
 
     function processRegistration() {
         var nickname = $('#nickNameInput').val();
+        $('#nickname').text(nickname);
         socket.emit('register', nickname);
     }
 
@@ -73,8 +73,12 @@ $(document).ready(function () {
         socket.emit('continue');
     });
 
-    $('#gameContent').on('click', '.newGame', function () {
-        socket.emit('startNewGame');
+    $('#gameContent').on('click', '.newGame', function (e) {
+        if (!confirm('Opravdu?')) {
+            e.preventDefault();
+        } else {
+            socket.emit('startNewGame');
+        }
     });
 
 
@@ -117,6 +121,13 @@ $(document).ready(function () {
 
     });
 
+    socket.on('somebodyLeft', function () {
+        gameId = null;
+        role = null;
+        enableElement('#setup');
+        $('#startGameButton').show();
+    });
+
     socket.on('continue', function (msg) {
         $('.startVote').attr("disabled", true);
         $('.startVote').hide();
@@ -153,6 +164,10 @@ $(document).ready(function () {
         $('.gameState').text(state);
     });
 
+    socket.on("*", function () {
+        console.log();
+    });
+
     socket.on('joined', function (data) {
         switch (data.status) {
             case 1: // full room
@@ -170,6 +185,8 @@ $(document).ready(function () {
                 gameId = data.roomId;
                 role = null;
                 enableElement('#startGame');
+                console.log(data);
+                console.log(socket.id);
                 var startButton = $('#startGameButton');
                 data.owner === socket.id
                     ? startButton.show()
@@ -198,12 +215,6 @@ $(document).ready(function () {
 
     socket.on('event', function (data) {
 
-    });
-
-    $('.bind-confirm').click(function (e) {
-        if (!confirm('Opravdu?')) {
-            e.preventDefault();
-        }
     });
 
 });
