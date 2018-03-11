@@ -4,6 +4,7 @@
     <title>SpyFall</title>
     <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css">
     <link href="css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="css/font-awesome-animation.css" rel="stylesheet" type="text/css">
     <link href="css/style.css" rel="stylesheet" type="text/css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -15,15 +16,24 @@
 </head>
 <body>
 
-
 <!--<button class="btn-default btn print d-none">Print</button>-->
 
+<div id="overlay">
+    <p class="text-center spinner-wrapper">
+        <i class="fa fa-spinner faa-spin animated em5"></i><br>
+        <span class="connection-label">Připojení k serveru</span>
+    </p>
+</div>
 
-<div class="container">
+<div class="container top-header">
     <div class="row">
         <div class="col-xs-12">
-            <i class="fa fa-eye" aria-hidden="true"></i>
-            Superšpión
+            <div class="main-logo"></div>
+            <span class="game-name">SUPER<br> ŠPION</span>
+            <div id="profile">
+                <i class="fa fa-user-o orange bold" aria-hidden="true"></i>
+                Eflyax
+            </div>
         </div>
     </div>
 </div>
@@ -37,7 +47,7 @@
                 <input type="text" id="nickNameInput" class="form-control">
                 <br>
                 <div class="col-md-4 center-block text-center">
-                    <button class="btn btn-dark" id="sendNickName">Potvrdit</button>
+                    <button class="btn confirm-button" id="sendNickName">Potvrdit</button>
                 </div>
             </div>
         </div>
@@ -45,13 +55,13 @@
         <div id="setup" class="state disabled">
             <div class="row">
                 <div class="col-md-6 form-group text-center">
-                    <button class="btn" id="create">
+                    <button class="btn confirm-button" id="create">
                         <i class="fa fa-plus-circle" aria-hidden="true"></i>
                         Založit hru
                     </button>
                 </div>
                 <div class="col-md-6 form-group text-center">
-                    <button class="btn" id="joinGameButton">Připojit se do hry</button>
+                    <button class="btn confirm-button" id="joinGameButton">Připojit se do hry</button>
                 </div>
             </div>
         </div>
@@ -59,48 +69,59 @@
         <div id="connectGame" class="state disabled">
             <div class="form-group">
                 <label for="gameIdToJoin">ID hry:</label>
-                <input type="text" id="gameIdToJoin" class="form-control">
+                <input type="text" id="gameIdToJoin" class="form-control" maxlength="5">
                 <br>
                 <div class="col-md-4 center-block text-center">
-                    <button class="btn btn-dark" id="joinToGameButton">Připojit se</button>
+                    <button class="btn confirm-button" id="joinToGameButton">Připojit se</button>
                 </div>
                 <span class="alert alert-danger" id="joinError"></span>
             </div>
 
-
         </div>
 
         <div id="startGame" class="state disabled">
-            Počet připojených klientů: <span id="usersCount"> </span>
-            <button class="btn" id="startGameButton">
-                Start
-                <i class="fa fa-play-circle" aria-hidden="true"></i>
-            </button>
-            ID místnosti: <p class="roomId"></p>
+            <div class="form-group">
+                <p class="roomId text-right">XXXXX</p>
+                Počet připojených klientů: <span id="usersCount"> </span>
+                <div class="col-md-4 center-block text-center">
+                    <br>
+                    <button class="btn btn-success" id="startGameButton">
+                        Start
+                        <i class="fa fa-play-circle" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </div>
         </div>
 
         <div id="gameContent" class="state disabled">
             <div class="row">
-                <div class="col-md-6">
-                    <span>Id hry: <span class="roomId"></span></span>
-                    <span>Místo: <span id="location"></span></span>
-                    <span>Role: <span id="role"></span></span>
+                <div class="col-md-12">
+                    <p class="roomId text-right">XXXXX</p>
+                    <p>Místo: <span id="location">Letadlo</span></p>
+                    <span>Role: <span id="role">Letuška</span></span>
                 </div>
-                <div class="col-md-6">
-                               <span class="currentTime">
-                                   0:00
-                               </span>
-                    <span class="gameState"></span>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <p class="currentTime">
+                        00:00
+                        <span class="gameState"></span>
+                    </p>
 
                 </div>
             </div>
 
-            <button class="btn startVote">
+            <button class="btn startVote confirm-button">
                 Zahájit hlasování
-                <i class="fa fa-comments" aria-hidden="true"></i>
+                <i class="fa fa-pause-circle" aria-hidden="true"></i>
             </button>
-            <button class="btn continue">Pokračovat ve hře</button>
-            <button class="btn newGame">Nová hra</button>
+            <br>
+            <button class="btn continue confirm-button">
+                Ukončit hlasování
+                <i class="fa fa-play-circle" aria-hidden="true"></i>
+            </button>
+            <br>
+            <button class="btn newGame confirm-button bind-confirm">Nová hra</button>
         </div>
         <!--</div>-->
         <!--</div>-->

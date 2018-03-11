@@ -9,11 +9,129 @@ html, body {
     height: 100%;
 }
 
+.blue-text {
+    color: #0195c3;
+}
+
+.purple-text {
+    color: #3a2632;
+}
+
+#joinError {
+    margin-top: 5%;
+    display: block;
+}
+
+.spinner-wrapper {
+    position: fixed;
+    top: 75%;
+    width: 100%;
+    min-height: 50px;
+}
+
+input {
+    text-align: center;
+    font-weight: bolder;
+}
+
+.em5 {
+    font-size: 5em;
+}
+
+.connection-label {
+    font-size: 1em;
+}
+
+.top-header {
+    display: none;
+    background-color: #3a2632;
+    position: fixed;
+    z-index: 5;
+    color: white;
+    height: 8%;
+    border-bottom: 2px solid #f8991b;
+}
+
+#profile {
+    position: fixed;
+    right: 2%;
+    height: 100%;
+    font-size: 1.5em;
+}
+
+.bold {
+    font-weight: bolder;
+}
+
+.orange {
+    color: #f8991b;
+}
+
+.confirm-button {
+    background-color: #3a2632;
+    color: white;
+    border: 2px solid #f8991b;
+}
+
+#location {
+    font-size: 2em;
+}
+
+.currentTime {
+    text-align: center;
+    border-top: 1px solid #0195c3;
+    border-bottom: 1px solid #0195c3;
+    font-size: 3em;
+}
+
+#role {
+    font-size: 2em;
+}
+
 #outer {
     position: relative;
     width: 100%;
     height: 100%;
-    background: radial-gradient(circle, whitesmoke, gray, black);
+    background: #0195c3;
+}
+
+.main-logo {
+    margin: 3px;
+    height: 98%;
+    min-width: 100px;
+    background-color: #0195c3;
+    background-image: url('../img/eye.png');
+    background-repeat: no-repeat;
+    background-size: 90px 60px;
+    background-position: center;
+    float: left;
+}
+
+.game-name {
+    margin-left: 5px;
+    display: block;
+    font-style: italic;
+    float: left;
+    font-size: 1.1em;
+}
+
+#overlay {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    min-height: 50px;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+    cursor: pointer;
+    display: block;
+    background-color: #0195c3;
+    background-image: url('../img/superSpyLogo.png');
+    background-repeat: no-repeat;
+    background-size: 300px 300px;
+    background-position: center;
 }
 
 #container {
@@ -33,13 +151,10 @@ html, body {
     background-color: #7dbf6c;
 }
 
-.currentTime {
-    font-size: 50px;
-}
-
 .state {
     padding: 20px 10px;
     display: none;
-    border: 1px solid black;
+    border: 10px solid #3a2632;
     border-radius: 5px 5px;
+    background-color: white;
 }

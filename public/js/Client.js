@@ -1,37 +1,30 @@
-// $(this).removeClass('enabled');
 $(document).ready(function () {
-// $(this).addClass('disabled');
+
     var errorElement = $('#joinError');
-
-// $(this).slideUp();
-
 
     const STATE_NEW = 'new',
         STATE_STARTED = 'started',
         STATE_PAUSED = 'paused',
         STATE_END = 'end';
     errorElement.hide();
-    var socket = io('http://127.0.0.1:300', {});
+    var socket = io('http://127.0.0.1:3000', {});
     var gameId = null;
 
     var role = '';
 
-
     var enableElement = function (selector) {
+
         $('.state').each(function () {
-
-            // $(this).hide();
-
             $(this).slideUp();
         });
         $(selector).show('fast');
 
     };
 
-    $('#nickNameInput').focus();
-    enableElement('#startGame'); // později smazat
+    enableElement('#overlay');//default
 
-
+    // enableElement('#startGame');
+    // $('#overlay').hide();
 
     $('#nickNameInput').on("keydown", function (event) {
         if (event.which === 13) {
@@ -42,10 +35,10 @@ $(document).ready(function () {
     $('#welcome').on('click', '#sendNickName', function () {
         processRegistration();
     });
+
     function processRegistration() {
         var nickname = $('#nickNameInput').val();
         socket.emit('register', nickname);
-
     }
 
     $('#startGame').on('click', '#startGameButton', function () {
@@ -100,11 +93,16 @@ $(document).ready(function () {
     };
 
     socket.on('connect', function () {
-        enableElement('#welcome');
+        setTimeout(function () {
+            $('#overlay').hide();
+            enableElement('#welcome');
+            $('#nickNameInput').focus();
+        }, 500);
     });
 
     socket.on('registered', function () {
         enableElement('#setup');
+        $('.top-header').show();
     });
 
     socket.io.on('connect_error', function () {
@@ -189,12 +187,19 @@ $(document).ready(function () {
         $('#role').text(data.role);
         $('.continue').hide();
         enableElement('#gameContent');
+        // todo - enable voting
         gameId = data.roomId;
         role = data.role;
     });
 
     socket.on('event', function (data) {
 
+    });
+
+    $('.bind-confirm').click(function (e) {
+        if (!confirm('Opravdu?')) {
+            e.preventDefault();
+        }
     });
 
 });
