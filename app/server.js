@@ -60,9 +60,9 @@ io.on('connection', function (socket) {
     });
 
     socket.on('print', function () {
-        console.log(clientManager.getClients());
-        console.log('_________________________________');
-        console.log(chatroomManager.getRooms());
+        // console.log(clientManager.getClients());
+        // console.log('_________________________________');
+        // console.log(chatroomManager.getRooms());
     });
 
     socket.on('continue', function () {

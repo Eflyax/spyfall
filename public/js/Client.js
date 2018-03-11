@@ -1,24 +1,52 @@
+// $(this).removeClass('enabled');
 $(document).ready(function () {
+// $(this).addClass('disabled');
     var errorElement = $('#joinError');
+
+// $(this).slideUp();
+
 
     const STATE_NEW = 'new',
         STATE_STARTED = 'started',
         STATE_PAUSED = 'paused',
         STATE_END = 'end';
-
     errorElement.hide();
-    var socket = io('http://127.0.0.1:3000', {});
+    var socket = io('http://127.0.0.1:300', {});
     var gameId = null;
+
     var role = '';
 
-    $('#welcome').on('click', '#sendNickName', function () {
-        var nickname = $('#nickNameInput').val();
-        socket.emit('register', nickname);
+
+    var enableElement = function (selector) {
+        $('.state').each(function () {
+
+            // $(this).hide();
+
+            $(this).slideUp();
+        });
+        $(selector).show('fast');
+
+    };
+
+    $('#nickNameInput').focus();
+    enableElement('#startGame'); // později smazat
+
+
+
+    $('#nickNameInput').on("keydown", function (event) {
+        if (event.which === 13) {
+            processRegistration();
+        }
     });
 
-    $('#app').on('click', '.print', function () {
-        socket.emit('print');
+    $('#welcome').on('click', '#sendNickName', function () {
+        processRegistration();
     });
+    function processRegistration() {
+        var nickname = $('#nickNameInput').val();
+        socket.emit('register', nickname);
+
+    }
 
     $('#startGame').on('click', '#startGameButton', function () {
         socket.emit('startGame', gameId);
@@ -52,19 +80,12 @@ $(document).ready(function () {
         socket.emit('startNewGame');
     });
 
-    var enableElement = function (selector) {
-        $('.state').each(function () {
-            $(this).removeClass('enabled');
-            $(this).addClass('disabled');
-        });
-        $(selector).addClass('enabled');
-    };
 
     var formatTime = function (sec_num) {
         var hours = Math.floor(sec_num / 3600);
         var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
-        var seconds = sec_num - (hours * 3600) - (minutes * 60);
 
+        var seconds = sec_num - (hours * 3600) - (minutes * 60);
         if (hours < 10) {
             hours = "0" + hours;
         }
@@ -75,6 +96,7 @@ $(document).ready(function () {
             seconds = "0" + seconds;
         }
         return minutes + ':' + seconds;
+
     };
 
     socket.on('connect', function () {

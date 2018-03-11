@@ -3,73 +3,110 @@
 <head>
     <title>SpyFall</title>
     <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="css/font-awesome.min.css" rel="stylesheet" type="text/css">
     <link href="css/style.css" rel="stylesheet" type="text/css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/socket.io.js"></script>
+    <script src="js/Client.js"></script>
+
 </head>
 <body>
 
-<div id="root"></div>
 
-<script src="js/bootstrap.min.js"></script>
-<script src="js/jquery.min.js"></script>
-<script src="js/socket.io.js"></script>
-<script src="js/Client.js"></script>
+<!--<button class="btn-default btn print d-none">Print</button>-->
 
-<div id="app">
 
-    <button class="btn-default btn print">Print</button>
-
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-
-                <div id="welcome" class="state disabled">
-                    <span>Přezdívka:</span>
-                    <input type="text" id="nickNameInput">
-                    <button class="btn" id="sendNickName">Potvrdit</button>
-                </div>
-
-                <div id="setup" class="state disabled">
-                    <button class="btn" id="create">Založit hru</button>
-                    <button class="btn" id="joinGameButton">Připojit se do hry</button>
-                </div>
-
-                <div id="connectGame" class="state disabled">
-                    <span>ID hry: </span>
-                    <input type="text" id="gameIdToJoin">
-                    <button class="btn" id="joinToGameButton">Připojit se</button>
-                    <span class="alert alert-danger" id="joinError"></span>
-                </div>
-
-                <div id="startGame" class="state disabled">
-                    Počet připojených klientů: <span id="usersCount"> </span>
-                    <button class="btn" id="startGameButton">Start</button>
-                    ID místnosti: <p class="roomId"></p>
-                </div>
-
-                <div id="gameContent" class="state disabled">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <span>Id hry: <span class="roomId"></span></span>
-                            <span>Místo: <span id="location"></span></span>
-                            <span>Role: <span id="role"></span></span>
-                        </div>
-                        <div class="col-md-6">
-                            <span class="currentTime">
-                                0:00
-                            </span>
-                            <span class="gameState"></span>
-
-                        </div>
-                    </div>
-
-                    <button class="btn startVote">Zahájit hlasování</button>
-                    <button class="btn continue">Pokračovat ve hře</button>
-                    <button class="btn newGame">Nová hra</button>
-                </div>
-            </div>
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12">
+            <i class="fa fa-eye" aria-hidden="true"></i>
+            Superšpión
         </div>
     </div>
 </div>
+
+<div id="outer">
+    <div id="container">
+
+        <div id="welcome" class="state disabled">
+            <div class="form-group">
+                <label for="nickNameInput">Přezdívka:</label>
+                <input type="text" id="nickNameInput" class="form-control">
+                <br>
+                <div class="col-md-4 center-block text-center">
+                    <button class="btn btn-dark" id="sendNickName">Potvrdit</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="setup" class="state disabled">
+            <div class="row">
+                <div class="col-md-6 form-group text-center">
+                    <button class="btn" id="create">
+                        <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                        Založit hru
+                    </button>
+                </div>
+                <div class="col-md-6 form-group text-center">
+                    <button class="btn" id="joinGameButton">Připojit se do hry</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="connectGame" class="state disabled">
+            <div class="form-group">
+                <label for="gameIdToJoin">ID hry:</label>
+                <input type="text" id="gameIdToJoin" class="form-control">
+                <br>
+                <div class="col-md-4 center-block text-center">
+                    <button class="btn btn-dark" id="joinToGameButton">Připojit se</button>
+                </div>
+                <span class="alert alert-danger" id="joinError"></span>
+            </div>
+
+
+        </div>
+
+        <div id="startGame" class="state disabled">
+            Počet připojených klientů: <span id="usersCount"> </span>
+            <button class="btn" id="startGameButton">
+                Start
+                <i class="fa fa-play-circle" aria-hidden="true"></i>
+            </button>
+            ID místnosti: <p class="roomId"></p>
+        </div>
+
+        <div id="gameContent" class="state disabled">
+            <div class="row">
+                <div class="col-md-6">
+                    <span>Id hry: <span class="roomId"></span></span>
+                    <span>Místo: <span id="location"></span></span>
+                    <span>Role: <span id="role"></span></span>
+                </div>
+                <div class="col-md-6">
+                               <span class="currentTime">
+                                   0:00
+                               </span>
+                    <span class="gameState"></span>
+
+                </div>
+            </div>
+
+            <button class="btn startVote">
+                Zahájit hlasování
+                <i class="fa fa-comments" aria-hidden="true"></i>
+            </button>
+            <button class="btn continue">Pokračovat ve hře</button>
+            <button class="btn newGame">Nová hra</button>
+        </div>
+        <!--</div>-->
+        <!--</div>-->
+    </div>
+</div>
+<!--</div>-->
 
 </body>
 </html>
