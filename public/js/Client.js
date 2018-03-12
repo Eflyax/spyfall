@@ -1,11 +1,10 @@
-$(document).ready(function () {
-
+$.getScript("js/config.js").done(function (script, textStatus) {
     var errorElement = $('#joinError');
-
     const STATE_NEW = 'new',
         STATE_STARTED = 'started',
         STATE_PAUSED = 'paused',
         STATE_END = 'end';
+
     errorElement.hide();
 
     var gameId = null;
@@ -217,4 +216,6 @@ $(document).ready(function () {
 
     });
 
+}).fail(function (jqxhr, settings, exception) {
+    $("div.log").text("Triggered ajaxError handler.");
 });

@@ -9,4 +9,8 @@ module.exports = Object.freeze({
     SPY: 'Špión',
     SECONDS_TO_END: 480,
     MAX_PLAYERS: 8,
+    CARD: {
+        'Hotel': ['Recepční', 'Barman', 'Pokojská', 'Ředitel hotelu', 'Pikolík', 'Host', 'Ochranka'],
+        'Letadlo': ['Pilot', 'Druhý pilot', 'Pasažér v ekonomické třídě', 'Letecký mechanik', 'Pasažér v byzbys třídě', 'Letuška', 'Černý pasažér'],
+    }
 });

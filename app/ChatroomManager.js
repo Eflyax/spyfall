@@ -4,13 +4,8 @@ module.exports = function () {
     // mapping of all available chatrooms
     const chatrooms = new Map();
 
-    var cards = {
-        'Hotel': ['Recepční', 'Barman', 'Pokojská', 'Ředitel hotelu', 'Pikolík', 'Host', 'Ochranka'],
-        'Letadlo': ['Pilot', 'Druhý pilot', 'Pasažér v ekonomické třídě', 'Letecký mechanik', 'Pasažér v byzbys třídě', 'Letuška', 'Černý pasažér'],
-    };
-
     function getRolesForKey(key) {
-        return cards[key];
+        return C.CARD[key];
     }
 
     function createRoom(idRoom, socketId) {
@@ -36,9 +31,9 @@ module.exports = function () {
     }
 
     function pickRandomRole(location) {
-        var randomIndex = Math.floor(Math.random() * cards[location].length);
+        var randomIndex = Math.floor(Math.random() * C.CARD[location].length);
 
-        return cards[location][randomIndex];
+        return C.CARD[location][randomIndex];
     }
 
     function getUsersCount(id) {
@@ -70,7 +65,7 @@ module.exports = function () {
     function pickRandomLocation() {
         var result;
         var count = 0;
-        for (var prop in cards) {
+        for (var prop in C.CARD) {
             if (Math.random() < 1 / ++count) {
                 result = prop;
             }
